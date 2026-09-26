@@ -31,7 +31,7 @@ export default function SignupPage() {
     if (form.password !== form.confirm) { toast.error('Passwords do not match.'); return; }
 
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email:    form.email.trim(),
       password: form.password,
       options: {
@@ -46,6 +46,9 @@ export default function SignupPage() {
 
     if (error) {
       toast.error(error.message || 'Signup failed. Please try again.');
+    } else if (data?.session) {
+      toast.success('Account created successfully! 🎉');
+      navigate('/dashboard');
     } else {
       toast.success('Check your email for the verification code!');
       setStep(2);
