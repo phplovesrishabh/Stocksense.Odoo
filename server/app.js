@@ -11,13 +11,13 @@ const { errorHandler }  = require('./middleware/errorHandler');
 // Route modules
 const authRoutes = require('./routes/auth');
 // Future routes — uncomment as each phase is built:
-// const warehouseRoutes  = require('./routes/warehouses');
-// const productRoutes    = require('./routes/products');
-// const receiptRoutes    = require('./routes/receipts');
-// const deliveryRoutes   = require('./routes/deliveries');
-// const adjustmentRoutes = require('./routes/adjustments');
-// const ledgerRoutes     = require('./routes/ledger');
-// const dashboardRoutes  = require('./routes/dashboard');
+const warehouseRoutes  = require('./routes/warehouses');
+const productRoutes    = require('./routes/products');
+const receiptRoutes    = require('./routes/receipts');
+const deliveryRoutes   = require('./routes/deliveries');
+const adjustmentRoutes = require('./routes/adjustments');
+const ledgerRoutes     = require('./routes/ledger');
+const dashboardRoutes  = require('./routes/dashboard');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -54,13 +54,13 @@ app.get('/health', (_req, res) => {
 
 // ─── API Routes ───────────────────────────────────────────────
 app.use('/api/v1/auth', authRoutes);
-// app.use('/api/v1/warehouses',  warehouseRoutes);
-// app.use('/api/v1/products',    productRoutes);
-// app.use('/api/v1/receipts',    receiptRoutes);
-// app.use('/api/v1/deliveries',  deliveryRoutes);
-// app.use('/api/v1/adjustments', adjustmentRoutes);
-// app.use('/api/v1/ledger',      ledgerRoutes);
-// app.use('/api/v1/dashboard',   dashboardRoutes);
+app.use('/api/v1/warehouses',  warehouseRoutes);
+app.use('/api/v1/products',    productRoutes);
+app.use('/api/v1/receipts',    receiptRoutes);
+app.use('/api/v1/deliveries',  deliveryRoutes);
+app.use('/api/v1/adjustments', adjustmentRoutes);
+app.use('/api/v1/ledger',      ledgerRoutes);
+app.use('/api/v1/dashboard',   dashboardRoutes);
 
 // ─── 404 handler ─────────────────────────────────────────────
 app.use((_req, res) => {
