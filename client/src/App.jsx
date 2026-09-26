@@ -26,6 +26,14 @@ import ReceiptDetail    from './features/receipts/ReceiptDetail';
 import DeliveriesList   from './features/deliveries/DeliveriesList';
 import DeliveryForm     from './features/deliveries/DeliveryForm';
 import DeliveryDetail   from './features/deliveries/DeliveryDetail';
+
+import AdjustmentsList  from './features/adjustments/AdjustmentsList';
+import AdjustmentForm   from './features/adjustments/AdjustmentForm';
+import AdjustmentDetail from './features/adjustments/AdjustmentDetail';
+
+import LedgerPage       from './features/ledger/LedgerPage';
+
+import SettingsPage     from './features/settings/SettingsPage';
 export default function App() {
   const initialize = useAuthStore((s) => s.initialize);
 
@@ -74,8 +82,12 @@ export default function App() {
             <Route path="/deliveries"  element={<DeliveriesList />} />
             <Route path="/deliveries/new" element={<DeliveryForm />} />
             <Route path="/deliveries/:id" element={<DeliveryDetail />} />
-            {/* <Route path="/adjustments" element={<AdjustmentsPage />} /> */}
-            {/* <Route path="/ledger"      element={<LedgerPage />} /> */}
+            
+            <Route path="/adjustments" element={<AdjustmentsList />} />
+            <Route path="/adjustments/new" element={<AdjustmentForm />} />
+            <Route path="/adjustments/:id" element={<AdjustmentDetail />} />
+            
+            <Route path="/ledger"      element={<LedgerPage />} />
           </Route>
         </Route>
 
@@ -84,7 +96,7 @@ export default function App() {
           <Route element={<AppLayout />}>
             <Route path="/products/new" element={<ProductFormPage />} />
             <Route path="/products/:id/edit" element={<ProductFormPage />} />
-            {/* <Route path="/settings" element={<SettingsPage />} /> */}
+            <Route path="/settings" element={<SettingsPage />} />
           </Route>
         </Route>
 

@@ -1,4 +1,4 @@
-const supabase = require('../config/supabase');
+const { supabaseAdmin: supabase } = require('../config/supabase');
 const AuditLog = require('../models/AuditLog');
 
 // @desc    Get all deliveries
@@ -152,11 +152,8 @@ exports.validateDelivery = async (req, res, next) => {
 
     // 3. Process stock changes using RPC decrement_stock
     for (let item of delivery.delivery_items) {
-      const { error: stockError } = await supabase.rpc('decrement_stock', {
-        p_product_id: item.product_id,
-        p_warehouse_id: delivery.warehouse_id,
-        p_qty: item.quantity
-      });
+      const { data: currentStock } = await supabase.from('stock_levels').select('id, quantity').eq('product_id', item.product_id).eq('warehouse_id', delivery.warehouse_id).single();
+      const { error: stockError } = await supabase.from('stock_levels').update({ quantity: currentStock.quantity - item.quantity }).eq('id', currentStock.id);
       if (stockError) throw stockError;
     }
 

@@ -1,4 +1,4 @@
-const supabase = require('../config/supabase');
+const { supabaseAdmin: supabase } = require('../config/supabase');
 const AuditLog = require('../models/AuditLog');
 
 // @desc    Get all receipts
@@ -135,12 +135,14 @@ exports.validateReceipt = async (req, res, next) => {
 
     // 2. Process stock changes using RPC if possible. We will use the increment_stock RPC.
     for (let item of receipt.receipt_items) {
-      const { error: stockError } = await supabase.rpc('increment_stock', {
-        p_product_id: item.product_id,
-        p_warehouse_id: receipt.warehouse_id,
-        p_qty: item.quantity
-      });
-      if (stockError) throw stockError;
+      const { data: stock } = await supabase.from('stock_levels').select('*').eq('product_id', item.product_id).eq('warehouse_id', receipt.warehouse_id).maybeSingle();
+      if (stock) {
+        const { error: stockError } = await supabase.from('stock_levels').update({ quantity: stock.quantity + item.quantity }).eq('id', stock.id);
+        if (stockError) throw stockError;
+      } else {
+        const { error: stockError } = await supabase.from('stock_levels').insert([{ product_id: item.product_id, warehouse_id: receipt.warehouse_id, quantity: item.quantity }]);
+        if (stockError) throw stockError;
+      }
     }
 
     // 3. Update receipt status to done

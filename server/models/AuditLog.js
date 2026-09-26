@@ -4,7 +4,6 @@ const AuditLogSchema = new mongoose.Schema({
   actionType: {
     type: String,
     required: true,
-    enum: ['PRODUCT_CREATED', 'PRODUCT_UPDATED', 'STOCK_RECEIPT', 'STOCK_DELIVERY', 'STOCK_ADJUSTMENT'],
   },
   performedBy: {
     userId: { type: String, required: true },

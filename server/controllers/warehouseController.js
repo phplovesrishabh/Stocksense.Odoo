@@ -1,4 +1,4 @@
-const supabase = require('../config/supabase');
+const { supabaseAdmin: supabase } = require('../config/supabase');
 const AuditLog = require('../models/AuditLog');
 
 // @desc    Get all warehouses
@@ -8,7 +8,7 @@ exports.getWarehouses = async (req, res, next) => {
   try {
     const { data, error } = await supabase.from('warehouses').select('*').order('created_at', { ascending: false });
     if (error) throw error;
-    res.status(200).json({ success: true, count: data.length, data });
+    res.status(200).json({ success: true, count: data?.length || 0, data: data || [] });
   } catch (error) {
     next(error);
   }

@@ -1,4 +1,4 @@
-const supabase = require('../config/supabase');
+const { supabaseAdmin: supabase } = require('../config/supabase');
 const AuditLog = require('../models/AuditLog');
 
 // @desc    Get dashboard metrics

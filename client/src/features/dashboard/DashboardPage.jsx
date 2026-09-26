@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Package, AlertTriangle, XCircle, Inbox, Truck, RefreshCw } from 'lucide-react';
+import { Package, AlertTriangle, XCircle, Inbox, Truck, RefreshCw, BookOpen } from 'lucide-react';
 import PageHeader from '../../components/layout/PageHeader';
 import KPICard from '../../components/ui/KPICard';
 import Badge from '../../components/ui/Badge';

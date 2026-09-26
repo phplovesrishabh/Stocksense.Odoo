@@ -18,6 +18,7 @@ const deliveryRoutes   = require('./routes/deliveries');
 const adjustmentRoutes = require('./routes/adjustments');
 const ledgerRoutes     = require('./routes/ledger');
 const dashboardRoutes  = require('./routes/dashboard');
+const odooRoutes       = require('./routes/odoo');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -61,6 +62,7 @@ app.use('/api/v1/deliveries',  deliveryRoutes);
 app.use('/api/v1/adjustments', adjustmentRoutes);
 app.use('/api/v1/ledger',      ledgerRoutes);
 app.use('/api/v1/dashboard',   dashboardRoutes);
+app.use('/api/v1/odoo',        odooRoutes);
 
 // ─── 404 handler ─────────────────────────────────────────────
 app.use((_req, res) => {
