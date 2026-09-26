@@ -183,18 +183,18 @@ export default function ProductDetailPage() {
                   </tr>
                 ) : (
                   recentMovements.map((move) => (
-                    <tr key={move.transaction_id} className="hover:bg-[#252836]/50 transition-colors">
+                    <tr key={move._id} className="hover:bg-[#252836]/50 transition-colors">
                       <td className="px-6 py-4 text-[#94A3B8]">
                         {new Date(move.timestamp).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4">
-                        <Badge status={move.type} />
+                        <Badge status={move.actionType} />
                       </td>
-                      <td className={`px-6 py-4 text-right font-medium ${move.quantity_delta > 0 ? 'text-emerald-500' : move.quantity_delta < 0 ? 'text-red-500' : 'text-[#F1F5F9]'}`}>
-                        {move.quantity_delta > 0 ? '+' : ''}{move.quantity_delta}
+                      <td className={`px-6 py-4 text-right font-medium ${(move.details?.quantityDelta || 0) > 0 ? 'text-emerald-500' : (move.details?.quantityDelta || 0) < 0 ? 'text-red-500' : 'text-[#F1F5F9]'}`}>
+                        {(move.details?.quantityDelta || 0) > 0 ? '+' : ''}{move.details?.quantityDelta || 0}
                       </td>
                       <td className="px-6 py-4 font-mono text-[#F1F5F9]">
-                        {move.reference_id?.split('-')[0] || '—'}
+                        {(move.details?.receiptId || move.details?.deliveryId || move.details?.adjustmentId || '-').split('-')[0]}
                       </td>
                     </tr>
                   ))

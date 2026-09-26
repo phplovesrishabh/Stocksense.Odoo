@@ -24,7 +24,7 @@ export default function DashboardPage() {
       // Ensure backend endpoints /dashboard/kpis and /ledger exist, 
       // or at least handle the failure gracefully
       const [kpisRes, ledgerRes] = await Promise.all([
-        api.get('/dashboard/kpis').catch(() => ({ data: { data: {
+        api.get('/dashboard').catch(() => ({ data: { data: {
           total_products: 0,
           low_stock_items: 0,
           out_of_stock_items: 0,
