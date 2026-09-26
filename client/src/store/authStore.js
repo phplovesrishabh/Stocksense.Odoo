@@ -61,6 +61,7 @@ const useAuthStore = create((set, get) => ({
         email:    session.user.email,
         role:     profile?.role     ?? 'staff',
         fullName: profile?.full_name ?? '',
+        avatarUrl: session.user.user_metadata?.avatar_url || '',
       },
       loading: false,
     });

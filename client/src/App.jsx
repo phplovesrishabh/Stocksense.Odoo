@@ -34,6 +34,8 @@ import AdjustmentDetail from './features/adjustments/AdjustmentDetail';
 import LedgerPage       from './features/ledger/LedgerPage';
 
 import SettingsPage     from './features/settings/SettingsPage';
+import ProfilePage      from './features/profile/ProfilePage';
+
 export default function App() {
   const initialize = useAuthStore((s) => s.initialize);
 
@@ -88,6 +90,7 @@ export default function App() {
             <Route path="/adjustments/:id" element={<AdjustmentDetail />} />
             
             <Route path="/ledger"      element={<LedgerPage />} />
+            <Route path="/profile"     element={<ProfilePage />} />
           </Route>
         </Route>
 

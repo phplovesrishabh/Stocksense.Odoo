@@ -116,15 +116,27 @@ export default function Sidebar() {
         </button>
 
         {/* Profile */}
-        <div className={clsx("flex items-center gap-3", collapsed ? "justify-center" : "")}>
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#4F6EF7] to-[#7C3AED] flex items-center justify-center text-white font-bold shrink-0">
-            {user?.email?.charAt(0).toUpperCase() || 'U'}
+        <NavLink 
+          to="/profile"
+          className={({ isActive }) => clsx(
+            "flex items-center gap-3 p-2 rounded-lg transition-colors duration-150",
+            collapsed ? "justify-center" : "",
+            isActive ? "bg-[#252836]" : "hover:bg-[#252836]"
+          )}
+          title="My Profile"
+        >
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#4F6EF7] to-[#7C3AED] flex items-center justify-center text-white font-bold shrink-0 overflow-hidden border-2 border-[#252836]">
+            {user?.avatarUrl ? (
+              <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+            ) : (
+              user?.email?.charAt(0).toUpperCase() || 'U'
+            )}
           </div>
           
           {!collapsed && (
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-[#F1F5F9] truncate">
-                {user?.email}
+                {user?.fullName || user?.email}
               </p>
               <span className={clsx(
                 "inline-block px-2 py-0.5 mt-0.5 rounded-full text-[11px] font-medium",
@@ -134,7 +146,7 @@ export default function Sidebar() {
               </span>
             </div>
           )}
-        </div>
+        </NavLink>
 
         {/* Logout */}
         {!collapsed ? (
