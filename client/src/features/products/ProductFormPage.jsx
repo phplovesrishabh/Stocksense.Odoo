@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ChevronLeft, Save, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import PageHeader from '../../components/layout/PageHeader';
 import api from '../../lib/api';
 import toast from 'react-hot-toast';
@@ -126,32 +127,39 @@ export default function ProductFormPage() {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#4F6EF7] animate-spin" />
+      <div className="flex-1 flex items-center justify-center h-full">
+        <Loader2 className="w-8 h-8 text-brand-primary animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-[#0F1117]">
-      <div className="px-8 py-4 border-b border-[#2E3348] flex items-center gap-4">
-        <Link to="/products" className="p-2 text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#252836] rounded-lg transition-colors">
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="px-8 py-4 border-b border-white/5 bg-background-dark/50 backdrop-blur-xl flex items-center gap-4 sticky top-0 z-10">
+        <Link to="/products" className="p-2 text-text-secondary hover:text-white hover:bg-white/5 rounded-lg transition-colors">
           <ChevronLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-xl font-bold text-[#F1F5F9]">
+          <h1 className="text-xl font-heading font-bold text-white tracking-tight">
             {isEdit ? 'Edit Product' : 'Create Product'}
           </h1>
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-8">
-        <div className="max-w-2xl mx-auto bg-[#1A1D27] border border-[#2E3348] rounded-xl p-8 shadow-lg shadow-black/20">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="max-w-2xl mx-auto glass-card rounded-2xl p-8 shadow-2xl"
+        >
           <form onSubmit={handleSubmit} className="space-y-6">
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#F1F5F9]">Product Name <span className="text-red-500">*</span></label>
+                <label className="text-xs font-medium text-text-muted uppercase tracking-wider ml-1">
+                  Product Name <span className="text-rose-500">*</span>
+                </label>
                 <input
                   required
                   type="text"
@@ -159,12 +167,14 @@ export default function ProductFormPage() {
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="e.g. Widget A"
-                  className="w-full bg-[#1E2130] border border-[#2E3348] focus:border-[#4F6EF7] focus:ring-1 focus:ring-[#4F6EF7] text-[#F1F5F9] rounded-lg px-4 py-2 outline-none transition-all placeholder-[#475569]"
+                  className="w-full glass-input px-4 py-3 outline-none"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#F1F5F9]">SKU <span className="text-red-500">*</span></label>
+                <label className="text-xs font-medium text-text-muted uppercase tracking-wider ml-1">
+                  SKU <span className="text-rose-500">*</span>
+                </label>
                 <div className="relative">
                   <input
                     required
@@ -173,29 +183,31 @@ export default function ProductFormPage() {
                     value={formData.sku}
                     onChange={handleChange}
                     placeholder="e.g. WGT-001"
-                    className={`w-full bg-[#1E2130] border ${
-                      skuAvailable === false ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 
-                      skuAvailable === true ? 'border-emerald-500/50 focus:border-[#4F6EF7]' : 'border-[#2E3348] focus:border-[#4F6EF7]'
-                    } focus:ring-1 text-[#F1F5F9] rounded-lg px-4 py-2 outline-none transition-all placeholder-[#475569]`}
+                    className={`w-full glass-input px-4 py-3 outline-none ${
+                      skuAvailable === false ? 'border-rose-500/50 focus:border-rose-500 focus:ring-rose-500/20' : 
+                      skuAvailable === true ? 'border-emerald-500/30 focus:border-emerald-500 focus:ring-emerald-500/20' : ''
+                    }`}
                   />
                   <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    {skuChecking && <Loader2 className="w-4 h-4 text-[#94A3B8] animate-spin" />}
-                    {!skuChecking && skuAvailable === true && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
-                    {!skuChecking && skuAvailable === false && <XCircle className="w-4 h-4 text-red-500" />}
+                    {skuChecking && <Loader2 className="w-4 h-4 text-text-muted animate-spin" />}
+                    {!skuChecking && skuAvailable === true && <CheckCircle2 className="w-4 h-4 text-emerald-500 drop-shadow-sm" />}
+                    {!skuChecking && skuAvailable === false && <XCircle className="w-4 h-4 text-rose-500 drop-shadow-sm" />}
                   </div>
                 </div>
                 {!skuChecking && skuAvailable === false && (
-                  <p className="text-xs text-red-500 mt-1">✕ SKU already in use</p>
+                  <p className="text-xs font-medium text-rose-400 mt-1 ml-1">✕ SKU already in use</p>
                 )}
                 {!skuChecking && skuAvailable === true && formData.sku && (
-                  <p className="text-xs text-emerald-500 mt-1">✓ Available</p>
+                  <p className="text-xs font-medium text-emerald-400 mt-1 ml-1">✓ Available</p>
                 )}
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#F1F5F9]">Category <span className="text-red-500">*</span></label>
+                <label className="text-xs font-medium text-text-muted uppercase tracking-wider ml-1">
+                  Category <span className="text-rose-500">*</span>
+                </label>
                 <input
                   required
                   type="text"
@@ -203,21 +215,25 @@ export default function ProductFormPage() {
                   value={formData.category}
                   onChange={handleChange}
                   placeholder="e.g. Electronics"
-                  className="w-full bg-[#1E2130] border border-[#2E3348] focus:border-[#4F6EF7] focus:ring-1 focus:ring-[#4F6EF7] text-[#F1F5F9] rounded-lg px-4 py-2 outline-none transition-all placeholder-[#475569]"
+                  className="w-full glass-input px-4 py-3 outline-none"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#F1F5F9]">Unit of Measure <span className="text-red-500">*</span></label>
+                <label className="text-xs font-medium text-text-muted uppercase tracking-wider ml-1">
+                  Unit of Measure <span className="text-rose-500">*</span>
+                </label>
                 <select
                   required
                   name="unit_of_measure"
                   value={formData.unit_of_measure}
                   onChange={handleChange}
-                  className="w-full bg-[#1E2130] border border-[#2E3348] focus:border-[#4F6EF7] focus:ring-1 focus:ring-[#4F6EF7] text-[#F1F5F9] rounded-lg px-4 py-2 outline-none appearance-none cursor-pointer"
+                  className="w-full glass-input px-4 py-3 outline-none appearance-none cursor-pointer text-white"
                 >
                   {UOM_OPTIONS.map(uom => (
-                    <option key={uom} value={uom}>{uom.toUpperCase()}</option>
+                    <option key={uom} value={uom} className="bg-background-dark text-white">
+                      {uom.toUpperCase()}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -225,44 +241,50 @@ export default function ProductFormPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#F1F5F9]">Reorder Threshold</label>
+                <label className="text-xs font-medium text-text-muted uppercase tracking-wider ml-1">
+                  Reorder Threshold
+                </label>
                 <input
                   type="number"
                   min="0"
                   name="reorder_threshold"
                   value={formData.reorder_threshold}
                   onChange={handleChange}
-                  className="w-full bg-[#1E2130] border border-[#2E3348] focus:border-[#4F6EF7] focus:ring-1 focus:ring-[#4F6EF7] text-[#F1F5F9] rounded-lg px-4 py-2 outline-none transition-all"
+                  className="w-full glass-input px-4 py-3 outline-none"
                 />
-                <p className="text-xs text-[#94A3B8]">Alert triggers below this quantity</p>
+                <p className="text-xs text-text-muted ml-1">Alert triggers below this quantity</p>
               </div>
 
               {!isEdit && (
                 <>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-[#F1F5F9]">Initial Stock</label>
+                    <label className="text-xs font-medium text-text-muted uppercase tracking-wider ml-1">
+                      Initial Stock
+                    </label>
                     <input
                       type="number"
                       min="0"
                       name="initial_stock"
                       value={formData.initial_stock}
                       onChange={handleChange}
-                      className="w-full bg-[#1E2130] border border-[#2E3348] focus:border-[#4F6EF7] focus:ring-1 focus:ring-[#4F6EF7] text-[#F1F5F9] rounded-lg px-4 py-2 outline-none transition-all"
+                      className="w-full glass-input px-4 py-3 outline-none"
                     />
                   </div>
                   
                   <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-medium text-[#F1F5F9]">Warehouse (for initial stock)</label>
+                    <label className="text-xs font-medium text-text-muted uppercase tracking-wider ml-1">
+                      Warehouse (for initial stock)
+                    </label>
                     <select
                       name="warehouse_id"
                       value={formData.warehouse_id}
                       onChange={handleChange}
                       required={formData.initial_stock > 0}
-                      className="w-full bg-[#1E2130] border border-[#2E3348] focus:border-[#4F6EF7] focus:ring-1 focus:ring-[#4F6EF7] text-[#F1F5F9] rounded-lg px-4 py-2 outline-none appearance-none cursor-pointer"
+                      className="w-full glass-input px-4 py-3 outline-none appearance-none cursor-pointer text-white"
                     >
-                      <option value="">Select a warehouse...</option>
+                      <option value="" className="bg-background-dark text-text-muted">Select a warehouse...</option>
                       {warehouses.map(wh => (
-                        <option key={wh.id} value={wh.id}>{wh.name}</option>
+                        <option key={wh.id} value={wh.id} className="bg-background-dark text-white">{wh.name}</option>
                       ))}
                     </select>
                   </div>
@@ -270,11 +292,11 @@ export default function ProductFormPage() {
               )}
             </div>
 
-            <div className="pt-6 mt-6 border-t border-[#2E3348] flex items-center justify-end gap-4">
+            <div className="pt-8 mt-6 border-t border-white/5 flex items-center justify-end gap-4">
               <button
                 type="button"
                 onClick={() => navigate('/products')}
-                className="px-6 py-2 rounded-lg font-medium text-[#F1F5F9] border border-[#2E3348] hover:bg-[#252836] transition-colors"
+                className="px-6 py-2.5 rounded-xl font-medium text-text-secondary border border-white/10 hover:bg-white/5 hover:text-white transition-colors"
                 disabled={saving}
               >
                 Cancel
@@ -282,18 +304,18 @@ export default function ProductFormPage() {
               <button
                 type="submit"
                 disabled={saving || skuAvailable === false}
-                className="flex items-center gap-2 px-6 py-2 rounded-lg font-medium text-white bg-gradient-to-r from-[#4F6EF7] to-[#7C3AED] hover:from-[#5b78fa] hover:to-[#8749f7] transition-all shadow-md shadow-[#4F6EF7]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-8 py-2.5 rounded-xl font-medium text-white bg-gradient-to-r from-brand-primary to-brand-secondary hover:from-brand-primary/90 hover:to-brand-secondary/90 transition-all shadow-lg shadow-brand-primary/25 hover:shadow-brand-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {saving ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-5 h-5 animate-spin" />
                 ) : (
-                  <Save className="w-4 h-4" />
+                  <Save className="w-5 h-5" />
                 )}
                 {isEdit ? 'Save Changes' : 'Create Product'}
               </button>
             </div>
           </form>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

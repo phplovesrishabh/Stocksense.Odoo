@@ -9,6 +9,7 @@ const { connectMongo }  = require('./config/mongodb');
 const { errorHandler }  = require('./middleware/errorHandler');
 
 // Route modules
+const { initCronJobs } = require('./services/cronService');
 const authRoutes = require('./routes/auth');
 // Future routes — uncomment as each phase is built:
 const warehouseRoutes  = require('./routes/warehouses');
@@ -75,6 +76,9 @@ app.use(errorHandler);
 // ─── Start server ─────────────────────────────────────────────
 async function startServer() {
   await connectMongo();
+
+  // Initialize automated background jobs
+  initCronJobs();
 
   app.listen(PORT, () => {
     console.log(`🚀  StockSense API running on http://localhost:${PORT}`);

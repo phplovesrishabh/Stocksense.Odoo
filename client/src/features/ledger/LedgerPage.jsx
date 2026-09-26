@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Download, Search, Filter, Loader2, BookOpen } from 'lucide-react';
+import { Download, Search, Filter, Loader2, BookOpen, Activity } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import PageHeader from '../../components/layout/PageHeader';
 import Badge from '../../components/ui/Badge';
 import api from '../../lib/api';
+import useRealtimeSync from '../../hooks/useRealtimeSync';
 
 export default function LedgerPage() {
   const [logs, setLogs] = useState([]);
@@ -12,6 +14,10 @@ export default function LedgerPage() {
   useEffect(() => {
     fetchLogs();
   }, []);
+
+  useRealtimeSync(['receipts', 'deliveries', 'adjustments'], () => {
+    fetchLogs();
+  });
 
   const fetchLogs = async () => {
     setLoading(true);
@@ -33,90 +39,123 @@ export default function LedgerPage() {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <PageHeader 
-        title="Stock Ledger & Audit" 
+        title={<span className="text-gradient">Stock Ledger & Audit</span>}
         subtitle="Immutable history of all inventory movements and system changes"
         action={
           <button 
             disabled
-            className="flex items-center gap-2 bg-[#252836] text-[#94A3B8] px-4 py-2 rounded-lg font-medium opacity-70 cursor-not-allowed group relative"
+            className="flex items-center gap-2 glass-button px-5 py-2.5 rounded-xl font-medium opacity-70 cursor-not-allowed group relative"
           >
             <Download className="w-4 h-4" />
             Export CSV
-            <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-[#0F1117] text-[#94A3B8] text-xs px-2 py-1 rounded border border-[#2E3348] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            <span className="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-background-dark text-text-muted text-xs px-3 py-1.5 rounded-lg border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg">
               Coming soon
             </span>
           </button>
         }
       />
 
-      <div className="flex-1 overflow-y-auto p-6">
-        <div className="bg-[#1A1D27] rounded-xl border border-[#2E3348] flex flex-col h-full min-h-[500px]">
-          
-          {/* Toolbar */}
-          <div className="p-4 border-b border-[#2E3348] flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-            <div className="relative w-full sm:max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
-              <input
-                type="text"
-                placeholder="Search action or user email..."
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                className="w-full bg-[#0F1117] border border-[#2E3348] text-[#F1F5F9] rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-[#4F6EF7] transition-colors"
-              />
+      <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center"
+        >
+          <div className="relative w-full sm:max-w-md group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted group-focus-within:text-brand-primary transition-colors" />
+            <input
+              type="text"
+              placeholder="Search action or user email..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="w-full glass-input pl-12 pr-4 py-3 outline-none"
+            />
+          </div>
+        </motion.div>
+
+        {/* Table */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="glass-card flex-1 flex flex-col min-h-[500px]"
+        >
+          <div className="px-6 py-5 border-b border-white/10 flex justify-between items-center bg-white/5">
+            <h2 className="text-lg font-heading font-semibold text-white flex items-center gap-2">
+              <Activity className="w-5 h-5 text-brand-primary" />
+              Audit Log
+            </h2>
+            <div className="text-sm text-text-secondary font-medium bg-white/5 px-3 py-1 rounded-full border border-white/10">
+              {filteredLogs.length} {filteredLogs.length === 1 ? 'Entry' : 'Entries'}
             </div>
-            {/* Future filters could go here */}
           </div>
-
-          {/* Table */}
-          <div className="flex-1 overflow-auto">
-            {loading ? (
-              <div className="flex justify-center py-12">
-                <Loader2 className="w-8 h-8 text-[#4F6EF7] animate-spin" />
-              </div>
-            ) : filteredLogs.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-[#94A3B8]">
-                <div className="w-16 h-16 rounded-full bg-[#252836] flex items-center justify-center mb-4">
-                  <BookOpen className="w-8 h-8 text-[#4F6EF7]" />
-                </div>
-                <h3 className="text-[#F1F5F9] font-medium mb-1">No ledger entries</h3>
-                <p className="text-sm text-center max-w-sm">
-                  {searchTerm ? "No entries match your search." : "Stock movements and system actions will appear here."}
-                </p>
-              </div>
-            ) : (
-              <table className="w-full text-left text-sm whitespace-nowrap">
-                <thead className="bg-[#252836] text-[#94A3B8] sticky top-0">
+          
+          <div className="flex-1 overflow-auto p-2">
+            <table className="w-full text-left text-sm whitespace-nowrap border-separate border-spacing-y-2">
+              <thead className="text-xs text-text-secondary uppercase tracking-wider sticky top-0 z-10 bg-background-dark/80 backdrop-blur-md">
+                <tr>
+                  <th className="px-6 py-4 font-semibold rounded-l-xl">Timestamp</th>
+                  <th className="px-6 py-4 font-semibold">Action</th>
+                  <th className="px-6 py-4 font-semibold">User</th>
+                  <th className="px-6 py-4 font-semibold rounded-r-xl">Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
                   <tr>
-                    <th className="px-6 py-3 font-semibold">Timestamp</th>
-                    <th className="px-6 py-3 font-semibold">Action</th>
-                    <th className="px-6 py-3 font-semibold">User</th>
-                    <th className="px-6 py-3 font-semibold">Details</th>
+                    <td colSpan="4" className="px-6 py-20 text-center text-text-muted">
+                      <div className="relative mx-auto w-12 h-12">
+                        <div className="w-12 h-12 border-4 border-white/10 border-t-brand-primary rounded-full animate-spin"></div>
+                      </div>
+                      <p className="mt-4 font-medium">Loading ledger...</p>
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-[#2E3348]">
-                  {filteredLogs.map((log) => (
-                    <tr key={log._id} className="hover:bg-[#252836]/50 transition-colors">
-                      <td className="px-6 py-4 text-[#94A3B8] font-mono text-xs">
-                        {new Date(log.timestamp).toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4">
-                        <Badge status={log.actionType} />
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-[#F1F5F9]">{log.performedBy?.email || 'System'}</div>
-                        <div className="text-xs text-[#94A3B8] mt-0.5">{log.performedBy?.role || 'user'}</div>
-                      </td>
-                      <td className="px-6 py-4 text-[#94A3B8] font-mono text-xs whitespace-pre-wrap truncate max-w-xs">
-                        {JSON.stringify(log.details)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+                ) : filteredLogs.length === 0 ? (
+                  <tr>
+                    <td colSpan="4" className="px-6 py-20 text-center text-text-muted">
+                      <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-6 shadow-inner">
+                        <BookOpen className="w-10 h-10 text-brand-primary/50" />
+                      </div>
+                      <h3 className="text-white font-medium text-lg mb-2">No ledger entries</h3>
+                      <p className="text-sm text-center max-w-sm mx-auto text-text-secondary">
+                        {searchTerm ? "No entries match your search." : "Stock movements and system actions will appear here."}
+                      </p>
+                    </td>
+                  </tr>
+                ) : (
+                  <AnimatePresence>
+                    {filteredLogs.map((log, idx) => (
+                      <motion.tr 
+                        key={log._id} 
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 + (idx * 0.02) }}
+                        className="bg-white/5 hover:bg-white/10 transition-colors group"
+                      >
+                        <td className="px-6 py-4 text-text-secondary font-mono text-xs rounded-l-xl">
+                          {new Date(log.timestamp).toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4">
+                          <Badge status={log.actionType} />
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="font-medium text-white group-hover:text-brand-primary transition-colors">{log.performedBy?.email || 'System'}</div>
+                          <div className="text-xs text-text-secondary mt-1">{log.performedBy?.role || 'user'}</div>
+                        </td>
+                        <td className="px-6 py-4 text-text-secondary font-mono text-xs whitespace-pre-wrap truncate max-w-sm rounded-r-xl">
+                          <div className="bg-black/20 p-2 rounded border border-white/5 overflow-hidden text-ellipsis group-hover:border-white/10 transition-colors">
+                            {JSON.stringify(log.details)}
+                          </div>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                )}
+              </tbody>
+            </table>
           </div>
-
-        </div>
+        </motion.div>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Camera, Loader2, User, Save, UploadCloud } from 'lucide-react';
+import { motion } from 'framer-motion';
 import useAuthStore from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
 
@@ -83,15 +84,28 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="p-8 max-w-2xl mx-auto w-full">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-[#F1F5F9]">My Profile</h1>
-        <p className="text-[#94A3B8] mt-1">Manage your account settings and profile information.</p>
-      </div>
+    <div className="p-8 max-w-2xl mx-auto w-full flex-1 overflow-y-auto">
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mb-8"
+      >
+        <h1 className="text-3xl font-heading font-bold text-white tracking-tight flex items-center gap-3">
+          <User className="w-8 h-8 text-brand-primary" />
+          <span className="text-gradient">My Profile</span>
+        </h1>
+        <p className="text-text-secondary mt-2">Manage your account settings and profile information.</p>
+      </motion.div>
 
-      <div className="bg-[#1A1D27] border border-[#2E3348] rounded-xl p-8">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="glass-card rounded-2xl p-8"
+      >
         {message.text && (
-          <div className={`p-4 rounded-lg mb-6 text-sm ${message.type === 'error' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}`}>
+          <div className={`p-4 rounded-xl mb-8 text-sm font-medium ${message.type === 'error' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}`}>
             {message.text}
           </div>
         )}
@@ -100,17 +114,17 @@ export default function ProfilePage() {
           {/* Avatar Section */}
           <div className="flex items-center gap-8">
             <div className="relative group">
-              <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-[#4F6EF7] to-[#7C3AED] flex items-center justify-center border-4 border-[#252836]">
+              <div className="w-28 h-28 rounded-full overflow-hidden bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center border-4 border-background-dark shadow-xl shadow-brand-primary/20">
                 {avatarUrl ? (
                   <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-3xl font-bold text-white">
+                  <span className="text-4xl font-bold text-white">
                     {user?.email?.charAt(0).toUpperCase() || 'U'}
                   </span>
                 )}
               </div>
-              <label className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-full cursor-pointer">
-                <Camera className="w-6 h-6 text-white" />
+              <label className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-all rounded-full cursor-pointer backdrop-blur-sm">
+                <Camera className="w-8 h-8 text-white drop-shadow-md" />
                 <input 
                   type="file" 
                   accept="image/*" 
@@ -122,46 +136,46 @@ export default function ProfilePage() {
             </div>
             
             <div>
-              <h3 className="font-medium text-[#F1F5F9]">Profile Photo</h3>
-              <p className="text-sm text-[#94A3B8] mt-1">JPG, GIF or PNG. Max size 5MB.</p>
+              <h3 className="font-heading font-semibold text-lg text-white">Profile Photo</h3>
+              <p className="text-sm text-text-secondary mt-1">JPG, GIF or PNG. Max size 5MB.</p>
               {uploading && (
-                <div className="flex items-center gap-2 mt-2 text-sm text-[#4F6EF7]">
+                <div className="flex items-center gap-2 mt-3 text-sm font-medium text-brand-primary">
                   <Loader2 className="w-4 h-4 animate-spin" /> Uploading...
                 </div>
               )}
             </div>
           </div>
 
-          <div className="h-px bg-[#2E3348] w-full" />
+          <div className="h-px bg-white/10 w-full" />
 
           {/* Details Section */}
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-[#94A3B8] mb-1.5">
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <label className="block text-xs font-medium text-text-muted uppercase tracking-wider ml-1">
                 Email Address (Read-only)
               </label>
               <input
                 type="email"
                 value={user?.email || ''}
                 disabled
-                className="w-full bg-[#1A1D27] border border-[#2E3348] rounded-lg px-4 py-2.5 text-[#94A3B8] cursor-not-allowed"
+                className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-text-secondary cursor-not-allowed font-medium"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-[#94A3B8] mb-1.5">
+            <div className="space-y-2">
+              <label className="block text-xs font-medium text-text-muted uppercase tracking-wider ml-1">
                 Role
               </label>
               <input
                 type="text"
                 value={user?.role === 'manager' ? 'Manager' : 'Staff'}
                 disabled
-                className="w-full bg-[#1A1D27] border border-[#2E3348] rounded-lg px-4 py-2.5 text-[#94A3B8] cursor-not-allowed"
+                className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-text-secondary cursor-not-allowed font-medium"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-[#F1F5F9] mb-1.5">
+            <div className="space-y-2">
+              <label className="block text-xs font-medium text-brand-primary uppercase tracking-wider ml-1">
                 Full Name
               </label>
               <input
@@ -169,23 +183,23 @@ export default function ProfilePage() {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Enter your full name"
-                className="w-full bg-[#252836] border border-[#2E3348] rounded-lg px-4 py-2.5 text-[#F1F5F9] placeholder-[#94A3B8] focus:outline-none focus:border-[#4F6EF7] focus:ring-1 focus:ring-[#4F6EF7] transition-all"
+                className="w-full glass-input px-4 py-3 outline-none"
               />
             </div>
           </div>
 
-          <div className="pt-4 flex justify-end">
+          <div className="pt-6 flex justify-end">
             <button
               type="submit"
               disabled={saving || uploading}
-              className="flex items-center gap-2 bg-[#4F6EF7] hover:bg-[#435EE0] disabled:bg-[#4F6EF7]/50 text-white px-6 py-2.5 rounded-lg font-medium transition-all"
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-brand-primary to-brand-secondary hover:from-brand-primary/90 hover:to-brand-secondary/90 text-white px-8 py-3 rounded-xl font-medium transition-all shadow-lg shadow-brand-primary/25 hover:shadow-brand-primary/40 disabled:opacity-50"
             >
               {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
               Save Changes
             </button>
           </div>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 }

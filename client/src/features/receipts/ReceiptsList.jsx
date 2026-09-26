@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Plus, Search, Filter, Eye } from 'lucide-react';
+import { Plus, Search, Filter, Eye, Inbox } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import PageHeader from '../../components/layout/PageHeader';
 import Badge from '../../components/ui/Badge';
 import api from '../../lib/api';
+import useRealtimeSync from '../../hooks/useRealtimeSync';
 
 export default function ReceiptsList() {
   const [receipts, setReceipts] = useState([]);
@@ -15,6 +17,10 @@ export default function ReceiptsList() {
   useEffect(() => {
     fetchReceipts();
   }, [statusFilter]);
+
+  useRealtimeSync(['receipts'], () => {
+    fetchReceipts();
+  });
 
   const fetchReceipts = async () => {
     setLoading(true);
@@ -46,12 +52,12 @@ export default function ReceiptsList() {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <PageHeader 
-        title="Receipts" 
+        title={<span className="text-gradient">Receipts</span>}
         subtitle="Manage incoming stock from suppliers"
         action={
           <Link 
             to="/receipts/new" 
-            className="flex items-center gap-2 bg-gradient-to-r from-[#4F6EF7] to-[#7C3AED] hover:from-[#5b78fa] hover:to-[#8749f7] text-white px-4 py-2 rounded-lg font-medium transition-all shadow-md shadow-[#4F6EF7]/20"
+            className="flex items-center gap-2 bg-gradient-to-r from-brand-primary to-brand-secondary hover:from-brand-primary/90 hover:to-brand-secondary/90 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-lg shadow-brand-primary/25 hover:shadow-brand-primary/40"
           >
             <Plus className="w-4 h-4" />
             Create Receipt
@@ -60,88 +66,135 @@ export default function ReceiptsList() {
       />
 
       <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#94A3B8]" />
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="flex flex-col sm:flex-row gap-4"
+        >
+          <div className="relative flex-1 group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted group-focus-within:text-brand-primary transition-colors" />
             <input 
               type="text"
               placeholder="Search receipts..."
-              className="w-full bg-[#1E2130] border border-[#2E3348] focus:border-[#4F6EF7] focus:ring-1 focus:ring-[#4F6EF7] text-[#F1F5F9] rounded-lg pl-10 pr-4 py-2 outline-none transition-all placeholder-[#475569]"
+              className="w-full glass-input pl-12 pr-4 py-3 outline-none"
             />
           </div>
           
-          <div className="relative w-full sm:w-48">
-            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+          <div className="relative w-full sm:w-56 group">
+            <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted group-focus-within:text-brand-primary transition-colors" />
             <select
               value={statusFilter}
               onChange={handleFilter}
-              className="w-full bg-[#1E2130] border border-[#2E3348] focus:border-[#4F6EF7] focus:ring-1 focus:ring-[#4F6EF7] text-[#F1F5F9] rounded-lg pl-9 pr-4 py-2 outline-none appearance-none cursor-pointer"
+              className="w-full glass-input pl-12 pr-10 py-3 outline-none appearance-none cursor-pointer"
             >
-              <option value="">All Statuses</option>
-              <option value="draft">Draft</option>
-              <option value="waiting">Waiting</option>
-              <option value="ready">Ready</option>
-              <option value="done">Done</option>
-              <option value="cancelled">Cancelled</option>
+              <option value="" className="bg-background-dark text-white">All Statuses</option>
+              <option value="draft" className="bg-background-dark text-white">Draft</option>
+              <option value="waiting" className="bg-background-dark text-white">Waiting</option>
+              <option value="ready" className="bg-background-dark text-white">Ready</option>
+              <option value="done" className="bg-background-dark text-white">Done</option>
+              <option value="cancelled" className="bg-background-dark text-white">Cancelled</option>
             </select>
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="bg-[#1A1D27] rounded-xl border border-[#2E3348] overflow-hidden flex-1 flex flex-col">
-          <div className="overflow-x-auto flex-1">
-            <table className="w-full text-sm text-left">
-              <thead className="text-xs text-[#94A3B8] uppercase bg-[#252836] sticky top-0 z-10">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="glass-card flex-1 flex flex-col min-h-[400px]"
+        >
+          <div className="px-6 py-5 border-b border-white/10 flex justify-between items-center bg-white/5">
+            <h2 className="text-lg font-heading font-semibold text-white flex items-center gap-2">
+              <Inbox className="w-5 h-5 text-brand-primary" />
+              Incoming Receipts
+            </h2>
+            <div className="text-sm text-text-secondary font-medium bg-white/5 px-3 py-1 rounded-full border border-white/10">
+              {receipts.length} {receipts.length === 1 ? 'Receipt' : 'Receipts'}
+            </div>
+          </div>
+
+          <div className="overflow-x-auto flex-1 p-2">
+            <table className="w-full text-sm text-left border-separate border-spacing-y-2">
+              <thead className="text-xs text-text-secondary uppercase tracking-wider sticky top-0 z-10 bg-background-dark/80 backdrop-blur-md">
                 <tr>
-                  <th className="px-6 py-4 font-semibold">ID & Date</th>
+                  <th className="px-6 py-4 font-semibold rounded-l-xl">ID & Date</th>
                   <th className="px-6 py-4 font-semibold">Supplier</th>
                   <th className="px-6 py-4 font-semibold">Warehouse</th>
                   <th className="px-6 py-4 font-semibold">Status</th>
-                  <th className="px-6 py-4 font-semibold text-right">Actions</th>
+                  <th className="px-6 py-4 font-semibold text-right rounded-r-xl">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#2E3348]">
+              <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="5" className="px-6 py-12 text-center text-[#94A3B8]">
-                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#4F6EF7] mx-auto"></div>
+                    <td colSpan="5" className="px-6 py-20 text-center text-text-muted">
+                      <div className="relative mx-auto w-12 h-12">
+                        <div className="w-12 h-12 border-4 border-white/10 border-t-brand-primary rounded-full animate-spin"></div>
+                      </div>
+                      <p className="mt-4 font-medium">Loading receipts...</p>
                     </td>
                   </tr>
                 ) : receipts.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="px-6 py-12 text-center text-[#94A3B8]">
-                      No receipts found.
+                    <td colSpan="5" className="px-6 py-20 text-center text-text-muted">
+                      <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-6 shadow-inner">
+                        <Inbox className="w-10 h-10 text-brand-primary/50" />
+                      </div>
+                      <h3 className="text-white font-medium text-lg mb-2">No receipts found</h3>
+                      <p className="max-w-sm mx-auto text-text-secondary">Try adjusting your filters or create a new receipt.</p>
                     </td>
                   </tr>
                 ) : (
-                  receipts.map((receipt) => (
-                    <tr key={receipt.id} className="hover:bg-[#252836]/50 transition-colors group">
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-[#F1F5F9]">{receipt.id.slice(0,8).toUpperCase()}</div>
-                        <div className="text-xs text-[#94A3B8] mt-0.5">{new Date(receipt.created_at).toLocaleDateString()}</div>
-                      </td>
-                      <td className="px-6 py-4 text-[#F1F5F9]">{receipt.supplier_name}</td>
-                      <td className="px-6 py-4 text-[#F1F5F9]">{receipt.warehouse?.name || 'Unknown'}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge status={receipt.status} />
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Link
-                            to={`/receipts/${receipt.id}`}
-                            className="p-2 text-[#94A3B8] hover:text-[#4F6EF7] hover:bg-[#4F6EF7]/10 rounded-lg transition-colors"
-                            title="View Details"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Link>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+                  <AnimatePresence>
+                    {receipts.map((receipt, idx) => (
+                      <motion.tr 
+                        key={receipt.id} 
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 + (idx * 0.03) }}
+                        className="bg-white/5 hover:bg-white/10 transition-colors group"
+                      >
+                        <td className="px-6 py-4 rounded-l-xl">
+                          <div className="font-medium font-mono text-white group-hover:text-brand-primary transition-colors">{receipt.id.slice(0,8).toUpperCase()}</div>
+                          <div className="text-xs text-text-secondary mt-1">{new Date(receipt.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</div>
+                        </td>
+                        <td className="px-6 py-4 text-white">
+                          <span className="px-2.5 py-1 bg-white/10 rounded-lg text-sm font-medium border border-white/5 group-hover:border-white/20 transition-colors">
+                            {receipt.supplier_name}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-white">
+                          <div className="flex items-center gap-2 text-text-secondary">
+                            <span className="w-2 h-2 rounded-full bg-brand-tertiary shadow-[0_0_8px_rgba(236,72,153,0.5)]"></span>
+                            {receipt.warehouse?.name || 'Unknown'}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <Badge status={receipt.status} />
+                        </td>
+                        <td className="px-6 py-4 text-right rounded-r-xl">
+                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Link
+                              to={`/receipts/${receipt.id}`}
+                              className="p-2 text-text-muted hover:text-white glass-button"
+                              title="View Details"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Link>
+                          </div>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
                 )}
               </tbody>
             </table>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
