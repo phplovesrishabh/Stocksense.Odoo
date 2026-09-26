@@ -1,122 +1,102 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import { useEffect } from 'react';
 
-function App() {
-  const [count, setCount] = useState(0)
+import useAuthStore from './store/authStore';
+import ProtectedRoute from './router/ProtectedRoute';
 
+// Auth pages
+import LoginPage        from './features/auth/LoginPage';
+import SignupPage       from './features/auth/SignupPage';
+import ResetPasswordPage from './features/auth/ResetPasswordPage';
+
+// Placeholder dashboard — will be replaced in Phase 2
+function DashboardPlaceholder() {
+  const { user, signOut } = useAuthStore();
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-[#0F1117] text-white">
+      <div className="bg-[#1A1D27] border border-white/10 rounded-2xl p-8 text-center max-w-sm w-full">
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center mx-auto mb-4">
+          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
+        <h2 className="text-xl font-bold mb-1">Auth working! 🎉</h2>
+        <p className="text-slate-400 text-sm mb-1">
+          Signed in as <span className="text-white font-medium">{user?.email}</span>
+        </p>
+        <p className="text-slate-400 text-sm mb-6">
+          Role: <span className={`font-medium px-2 py-0.5 rounded-full text-xs ${user?.role === 'manager' ? 'bg-violet-500/20 text-violet-300' : 'bg-indigo-500/20 text-indigo-300'}`}>
+            {user?.role}
+          </span>
+        </p>
         <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
+          onClick={signOut}
+          className="w-full rounded-lg border border-white/10 px-4 py-2 text-sm text-slate-300 hover:bg-white/5 transition"
         >
-          Count is {count}
+          Sign out
         </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      </div>
+      <p className="text-slate-600 text-xs">Dashboard UI coming in Phase 2</p>
+    </div>
+  );
 }
 
-export default App
+export default function App() {
+  const initialize = useAuthStore((s) => s.initialize);
+
+  // Initialize Supabase session once on mount
+  useEffect(() => {
+    let unsub;
+    initialize().then((fn) => { unsub = fn; });
+    return () => unsub?.();
+  }, [initialize]);
+
+  return (
+    <BrowserRouter>
+      {/* Toast notifications */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: '#1A1D27',
+            color: '#F8FAFC',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: '12px',
+            fontSize: '14px',
+          },
+          success: { iconTheme: { primary: '#10B981', secondary: '#1A1D27' } },
+          error:   { iconTheme: { primary: '#EF4444', secondary: '#1A1D27' } },
+        }}
+      />
+
+      <Routes>
+        {/* Public routes */}
+        <Route path="/login"          element={<LoginPage />} />
+        <Route path="/signup"         element={<SignupPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+        {/* Protected routes — all roles */}
+        <Route element={<ProtectedRoute allowedRoles={['manager', 'staff']} />}>
+          <Route path="/dashboard"   element={<DashboardPlaceholder />} />
+          {/* Phase 2+ routes will be added here */}
+          {/* <Route path="/products"    element={<ProductsPage />} /> */}
+          {/* <Route path="/receipts"    element={<ReceiptsPage />} /> */}
+          {/* <Route path="/deliveries"  element={<DeliveriesPage />} /> */}
+          {/* <Route path="/adjustments" element={<AdjustmentsPage />} /> */}
+          {/* <Route path="/ledger"      element={<LedgerPage />} /> */}
+        </Route>
+
+        {/* Manager-only routes */}
+        <Route element={<ProtectedRoute allowedRoles={['manager']} />}>
+          {/* <Route path="/settings" element={<SettingsPage />} /> */}
+          {/* <Route path="/products/new" element={<CreateProductPage />} /> */}
+        </Route>
+
+        {/* Default redirect */}
+        <Route path="/"  element={<Navigate to="/dashboard" replace />} />
+        <Route path="*"  element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
