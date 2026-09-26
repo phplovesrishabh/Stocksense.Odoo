@@ -175,25 +175,25 @@ export default function DashboardPage() {
                 </thead>
                 <tbody className="divide-y divide-[#2E3348]">
                   {recentActivity.map((act) => (
-                    <tr key={act.transaction_id} className="hover:bg-[#252836]/50 transition-colors">
+                    <tr key={act._id} className="hover:bg-[#252836]/50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap text-[#94A3B8]">
                         {new Date(act.timestamp).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge status={act.type} />
+                        <Badge status={act.actionType} />
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap font-mono text-[#F1F5F9]">
-                        {act.reference_id?.split('-')[0] || '-'}
+                        {(act.details?.receiptId || act.details?.deliveryId || act.details?.adjustmentId || '-').split('-')[0]}
                       </td>
                       <td className="px-6 py-4">
-                        <div className="font-medium text-[#F1F5F9]">{act.product_name}</div>
-                        <div className="text-xs text-[#94A3B8] font-mono mt-0.5">{act.product_sku}</div>
+                        <div className="font-medium text-[#F1F5F9]">{act.details?.productName || 'Unknown Product'}</div>
+                        <div className="text-xs text-[#94A3B8] font-mono mt-0.5">{act.details?.productSku || '-'}</div>
                       </td>
                       <td className="px-6 py-4 text-[#F1F5F9]">
-                        {act.warehouse_name}
+                        {act.details?.warehouseName || (act.details?.warehouseId || '-').split('-')[0]}
                       </td>
                       <td className="px-6 py-4 text-[#94A3B8]">
-                        {act.performed_by?.full_name || 'System'}
+                        {act.performedBy?.email || 'System'}
                       </td>
                     </tr>
                   ))}
