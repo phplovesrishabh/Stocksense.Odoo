@@ -4,6 +4,7 @@ import { Plus, Search, Filter, Eye, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageHeader from '../../components/layout/PageHeader';
 import Badge from '../../components/ui/Badge';
+import EmptyState from '../../components/ui/EmptyState';
 import api from '../../lib/api';
 import useAuthStore from '../../store/authStore';
 import useRealtimeSync from '../../hooks/useRealtimeSync';
@@ -142,14 +143,12 @@ export default function AdjustmentsList() {
                   </tr>
                 ) : adjustments.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="px-6 py-20 text-center text-text-muted">
-                      <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-6 shadow-inner">
-                        <Plus className="w-10 h-10 text-brand-primary/50" />
-                      </div>
-                      <h3 className="text-white font-medium text-lg mb-2">No adjustments found</h3>
-                      <p className="text-sm text-center max-w-sm mx-auto text-text-secondary">
-                        {statusFilter ? "No adjustments match your filters." : "Create a new adjustment to request a stock update."}
-                      </p>
+                    <td colSpan="7" className="p-0">
+                      <EmptyState 
+                        title="No adjustments found"
+                        description={statusFilter ? "No adjustments match your filters." : "Create a new adjustment to request a stock update."}
+                        icon={Plus}
+                      />
                     </td>
                   </tr>
                 ) : (

@@ -12,8 +12,8 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
-  Package2
 } from 'lucide-react';
+import Logo from '../ui/illustrations/Logo';
 import useAuthStore from '../../store/authStore';
 import clsx from 'clsx';
 
@@ -41,7 +41,7 @@ export default function Sidebar() {
       {/* Brand Header */}
       <div className="h-20 flex items-center px-6 border-b border-white/10">
         <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-brand-primary to-brand-secondary shadow-lg shadow-brand-primary/20 shrink-0">
-          <Package2 className="w-6 h-6 text-white" />
+          <Logo className="w-6 h-6 text-white" />
         </div>
         <AnimatePresence>
           {!collapsed && (

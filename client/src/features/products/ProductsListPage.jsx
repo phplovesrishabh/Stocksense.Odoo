@@ -4,6 +4,7 @@ import { Plus, Search, Filter, Eye, Edit2, Package } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageHeader from '../../components/layout/PageHeader';
 import Badge from '../../components/ui/Badge';
+import EmptyState from '../../components/ui/EmptyState';
 import api from '../../lib/api';
 import useRealtimeSync from '../../hooks/useRealtimeSync';
 import useAuthStore from '../../store/authStore';
@@ -184,12 +185,12 @@ export default function ProductsListPage() {
                   </tr>
                 ) : products.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="px-6 py-20 text-center text-text-muted">
-                      <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-6 shadow-inner">
-                        <Package className="w-10 h-10 text-brand-primary/50" />
-                      </div>
-                      <h3 className="text-white font-medium text-lg mb-2">No products found</h3>
-                      <p className="max-w-sm mx-auto text-text-secondary">Try adjusting your search filters or add a new product to get started.</p>
+                    <td colSpan="5" className="p-0">
+                      <EmptyState 
+                        title="No products found"
+                        description="Try adjusting your search filters or add a new product to get started."
+                        icon={Package}
+                      />
                     </td>
                   </tr>
                 ) : (
