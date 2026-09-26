@@ -1,6 +1,6 @@
 <div align="center">
 
-# 📦 StockSense
+# StockSense
 
 ### Real-time Inventory Management System — Built for Odoo Hackathon 2026
 
@@ -18,13 +18,13 @@
 
 ---
 
-## 🧭 What is StockSense?
+## Overview
 
 **StockSense** is a modular, real-time Inventory Management System (IMS) built for mid-size businesses operating **2–5 warehouses** with **500–5,000 SKUs**. It integrates with existing **Odoo ERP** instances to replace fragmented Excel sheets and manual registers with a centralized, role-aware, audit-ready platform.
 
 StockSense automates the core stock workflows — receipts, deliveries, and adjustments — while giving managers **live visibility into stock health** across all locations, and providing warehouse staff with a **streamlined guided interface** for day-to-day operations.
 
-### 🔴 The Problem It Solves
+### The Problem It Solves
 
 Mid-size warehouses today rely on a patchwork of spreadsheets, paper registers, and disconnected tools:
 
@@ -40,66 +40,66 @@ Mid-size warehouses today rely on a patchwork of spreadsheets, paper registers, 
 
 ---
 
-## ✨ Features
+## Features
 
-### 🔐 Authentication & Access Control
+### Authentication & Access Control
 - Email + password signup with **OTP email verification**
 - **Role-based access control** — Manager vs. Warehouse Staff
 - JWT-secured sessions; OTP password reset (10-minute expiry)
 - Manager-only routes hidden from Staff (not just disabled)
 
-### 📊 Live Dashboard
+### Live Dashboard
 - **5 real-time KPIs**: Total Products · Low Stock · Out of Stock · Pending Receipts · Pending Deliveries
 - Dashboard updates **within 2 seconds** of any stock operation (WebSocket push via Supabase Realtime)
 - Low Stock & Out of Stock alert banners with direct navigation
 - Filter by warehouse, document type, and status
 
-### 📋 Product Management
+### Product Management
 - Create, edit, and view products with SKU, category, UOM, and reorder threshold
 - **Real-time SKU uniqueness check** (500ms debounce)
 - Stock levels shown **per warehouse** on the product detail page
 - Smart search by name or SKU across all products
 
-### 📥 Receipts — Incoming Stock
+### Receipts — Incoming Stock
 - Full status workflow: `Draft → Waiting → Ready → Done`
 - Line-item receipt creation with product search
 - **Atomic stock increment** on validation (PostgreSQL transaction)
 - Auto-save draft to localStorage every 30 seconds
 
-### 🚚 Delivery Orders — Outgoing Stock
+### Delivery Orders — Outgoing Stock
 - Full status workflow: `Draft → Waiting → Ready → Done`
 - **Over-delivery blocked** at validation — shows exact shortfall per product
 - Atomic stock decrement with ledger entry on validation
 
-### ⚖️ Stock Adjustments
+### Stock Adjustments
 - Staff submit physical count discrepancies with reason/notes
 - **Manager approval workflow** — stock only corrects on Manager approve
 - Delta auto-calculated and color-coded (green = surplus, red = deficit)
 
-### ⚠️ Low Stock Alerts
+### Low Stock Alerts
 - Per-product reorder thresholds configured by Manager
 - Alert banner on dashboard when any product drops below threshold
 - Critical "Out of Stock" alert when quantity reaches zero
 
-### 🏭 Multi-Warehouse Support
+### Multi-Warehouse Support
 - Stock tracked **per product per warehouse**
 - All receipts, deliveries, and adjustments tied to a specific warehouse
 - Dashboard KPIs filterable by warehouse
 
-### 📖 Move History / Stock Ledger
+### Move History / Stock Ledger
 - **Every stock movement logged** in an append-only audit ledger (MongoDB)
 - Tamper-proof: no updates or deletes ever on ledger entries
 - Filterable by date range, product, warehouse, type, and user
 - Clickable references link back to source receipt/delivery/adjustment
 
-### 🔗 Odoo ERP Integration
+### Odoo ERP Integration
 - Settings panel for Odoo connection (host, port, DB, credentials)
 - **Test Connection** and **Sync Products** from Odoo catalog
 - Graceful stub — app works fully even if Odoo is unavailable
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology | Why |
 |-------|-----------|-----|
@@ -117,30 +117,30 @@ Mid-size warehouses today rely on a patchwork of spreadsheets, paper registers, 
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                          STOCKSENSE SYSTEM                          │
-│                                                                     │
-│   ┌─────────────┐      ┌──────────────────┐     ┌───────────────┐  │
-│   │   React.js  │ HTTP │   Node.js /      │PSQL │   Supabase    │  │
-│   │   Frontend  │◄────►│   Express API    │◄───►│  PostgreSQL   │  │
-│   │  (Vercel)   │      │  (Railway)       │     │  (Primary DB) │  │
-│   └─────────────┘      └──────┬───────────┘     └───────────────┘  │
-│          │  WebSocket         │                                     │
-│          │  (Realtime)        │ MongoDB Driver                      │
-│          ▼                    ▼                                     │
-│   ┌─────────────┐      ┌──────────────────┐                        │
-│   │  Supabase   │      │  MongoDB Atlas   │                        │
-│   │  Realtime   │      │  (Audit Ledger)  │                        │
-│   └─────────────┘      └──────────────────┘                        │
-│                                │                                    │
-│                         ┌──────▼───────────┐                       │
-│                         │  Odoo ERP        │                       │
-│                         │  (XML-RPC / REST)│                       │
-│                         └──────────────────┘                       │
-└─────────────────────────────────────────────────────────────────────┘
++---------------------------------------------------------------------+
+|                          STOCKSENSE SYSTEM                          |
+|                                                                     |
+|   +-------------+      +------------------+     +---------------+  |
+|   |   React.js  | HTTP |   Node.js /      |PSQL |   Supabase    |  |
+|   |   Frontend  |<---->|   Express API    |<--->|  PostgreSQL   |  |
+|   |  (Vercel)   |      |  (Railway)       |     |  (Primary DB) |  |
+|   +-------------+      +------+-----------+     +---------------+  |
+|          |  WebSocket         |                                     |
+|          |  (Realtime)        | MongoDB Driver                      |
+|          v                    v                                     |
+|   +-------------+      +------------------+                        |
+|   |  Supabase   |      |  MongoDB Atlas   |                        |
+|   |  Realtime   |      |  (Audit Ledger)  |                        |
+|   +-------------+      +------------------+                        |
+|                                |                                    |
+|                         +------v-----------+                       |
+|                         |  Odoo ERP        |                       |
+|                         |  (XML-RPC / REST)|                       |
+|                         +------------------+                       |
++---------------------------------------------------------------------+
 ```
 
 ### Database Responsibility Boundary
@@ -154,7 +154,7 @@ Mid-size warehouses today rely on a patchwork of spreadsheets, paper registers, 
 
 ---
 
-## 🗂️ Project Structure
+## Project Structure
 
 ```
 stocksense/
@@ -193,11 +193,11 @@ stocksense/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
-- Node.js ≥ 18
+- Node.js >= 18
 - A [Supabase](https://supabase.com) account (free tier works)
 - A [MongoDB Atlas](https://cloud.mongodb.com) account (free M0 cluster works)
 - Git
@@ -205,8 +205,8 @@ stocksense/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/stocksense-odoo.git
-cd stocksense-odoo
+git clone https://github.com/phplovesrishabh/Stocksense.Odoo.git
+cd Stocksense.Odoo
 ```
 
 ### 2. Set Up the Backend
@@ -248,9 +248,9 @@ VITE_API_BASE_URL=http://localhost:3001/api/v1
 
 ### 4. Set Up the Database
 
-In your Supabase project → SQL Editor, run the schema from [`StockSense_SAD.md`](./StockSense_SAD.md) § 6.1. This creates all 9 tables, indexes, and Row-Level Security policies.
+In your Supabase project, go to **SQL Editor** and run the schema from [`StockSense_SAD.md`](./StockSense_SAD.md) § 6.1. This creates all 9 tables, indexes, and Row-Level Security policies.
 
-Then in Supabase Dashboard → Database → Replication, enable Realtime on:
+Then in **Supabase Dashboard → Database → Replication**, enable Realtime on:
 `stock_levels` · `receipts` · `deliveries` · `adjustments`
 
 ### 5. Run Locally
@@ -269,9 +269,9 @@ Open [http://localhost:5173](http://localhost:5173)
 
 ---
 
-## 📡 API Reference
+## API Reference
 
-All endpoints prefixed with `/api/v1`. Protected endpoints require `Authorization: Bearer <JWT>`.
+All endpoints are prefixed with `/api/v1`. Protected endpoints require `Authorization: Bearer <JWT>`.
 
 ### Authentication
 | Method | Endpoint | Access | Description |
@@ -303,7 +303,7 @@ All endpoints prefixed with `/api/v1`. Protected endpoints require `Authorizatio
 | GET | `/receipts/:id` | Any | Detail with line items |
 | POST | `/receipts` | Any | Create (status: draft) |
 | PUT | `/receipts/:id/status` | Any | Advance status |
-| POST | `/receipts/:id/validate` | Any | Validate → stock +N |
+| POST | `/receipts/:id/validate` | Any | Validate — stock +N |
 
 ### Deliveries
 | Method | Endpoint | Access | Description |
@@ -312,15 +312,15 @@ All endpoints prefixed with `/api/v1`. Protected endpoints require `Authorizatio
 | GET | `/deliveries/:id` | Any | Detail with line items |
 | POST | `/deliveries` | Any | Create (status: draft) |
 | PUT | `/deliveries/:id/status` | Any | Advance status |
-| POST | `/deliveries/:id/validate` | Any | Validate → stock −N |
+| POST | `/deliveries/:id/validate` | Any | Validate — stock -N |
 
 ### Adjustments
 | Method | Endpoint | Access | Description |
 |--------|----------|--------|-------------|
-| GET | `/adjustments` | Manager: all · Staff: own | List adjustments |
+| GET | `/adjustments` | Manager: all / Staff: own | List adjustments |
 | POST | `/adjustments` | Any | Submit adjustment |
-| POST | `/adjustments/:id/approve` | Manager | Approve → apply delta |
-| POST | `/adjustments/:id/reject` | Manager | Reject → no change |
+| POST | `/adjustments/:id/approve` | Manager | Approve — apply delta |
+| POST | `/adjustments/:id/reject` | Manager | Reject — no change |
 
 ### Dashboard & Ledger
 | Method | Endpoint | Access | Description |
@@ -334,7 +334,7 @@ All endpoints prefixed with `/api/v1`. Protected endpoints require `Authorizatio
 ```json
 {
   "success": true,
-  "data": { },
+  "data": {},
   "meta": { "page": 1, "total": 120, "limit": 20 },
   "error": null
 }
@@ -342,30 +342,32 @@ All endpoints prefixed with `/api/v1`. Protected endpoints require `Authorizatio
 
 ---
 
-## 🔐 Role-Based Access
+## Role-Based Access
 
 | Capability | Manager | Staff |
 |------------|:-------:|:-----:|
-| View Dashboard KPIs | ✅ | ✅ |
-| Create / Edit Products | ✅ | ❌ |
-| Create Receipts & Deliveries | ✅ | ✅ |
-| Validate Receipts & Deliveries | ✅ | ✅ |
-| Submit Stock Adjustments | ✅ | ✅ |
-| **Approve** Stock Adjustments | ✅ | ❌ |
-| View All Move History | ✅ | ✅ (own only) |
-| Manage Warehouses | ✅ | ❌ |
-| Configure Odoo Integration | ✅ | ❌ |
-| View User List | ✅ | ❌ |
+| View Dashboard KPIs | Yes | Yes |
+| Create / Edit Products | Yes | No |
+| Create Receipts & Deliveries | Yes | Yes |
+| Validate Receipts & Deliveries | Yes | Yes |
+| Submit Stock Adjustments | Yes | Yes |
+| Approve Stock Adjustments | Yes | No |
+| View All Move History | Yes | Own only |
+| Manage Warehouses | Yes | No |
+| Configure Odoo Integration | Yes | No |
+| View User List | Yes | No |
 
 ---
 
-## 🗄️ Database Schema (Summary)
+## Database Schema
+
+### PostgreSQL (Supabase)
 
 ```
 user_profiles     → extends Supabase Auth (id, full_name, role)
 warehouses        → id, name, location, created_by
 products          → id, name, sku (UNIQUE), category, uom, reorder_threshold
-stock_levels      → product_id × warehouse_id → quantity  (UNIQUE pair)
+stock_levels      → product_id x warehouse_id → quantity  (UNIQUE pair)
 receipts          → id, supplier_name, warehouse_id, status, created_by
 receipt_items     → receipt_id, product_id, quantity
 deliveries        → id, customer_ref, warehouse_id, status, created_by
@@ -374,25 +376,34 @@ adjustments       → product_id, warehouse_id, recorded_qty, physical_qty,
                     delta (computed), reason, status, submitted_by, reviewed_by
 ```
 
-**MongoDB — `stock_ledger` collection (append-only):**
+### MongoDB — `stock_ledger` Collection (Append-Only)
+
 ```json
 {
   "transaction_id": "uuid",
   "type": "receipt | delivery | adjustment",
-  "product_id": "uuid", "product_sku": "string",
-  "warehouse_id": "uuid", "warehouse_name": "string",
-  "quantity_delta": 50, "quantity_before": 100, "quantity_after": 150,
+  "product_id": "uuid",
+  "product_sku": "string",
+  "warehouse_id": "uuid",
+  "warehouse_name": "string",
+  "quantity_delta": 50,
+  "quantity_before": 100,
+  "quantity_after": 150,
   "reference_id": "receipt/delivery/adjustment uuid",
-  "performed_by": { "user_id": "uuid", "full_name": "string", "role": "string" },
+  "performed_by": {
+    "user_id": "uuid",
+    "full_name": "string",
+    "role": "string"
+  },
   "timestamp": "ISODate"
 }
 ```
 
 ---
 
-## 🎨 Design System
+## Design System
 
-StockSense uses a **dark-mode-first** design system built with CSS custom properties.
+StockSense uses a dark-mode-first design system built with CSS custom properties.
 
 | Token | Value | Usage |
 |-------|-------|-------|
@@ -404,47 +415,48 @@ StockSense uses a **dark-mode-first** design system built with CSS custom proper
 | `--color-warning` | `#F59E0B` | Low stock, Waiting status |
 | `--color-danger` | `#EF4444` | Out-of-stock, errors |
 
-**Typography:** Inter (Google Fonts) · **Base grid:** 8px spacing scale
+**Typography:** Inter (Google Fonts) — **Base grid:** 8px spacing scale
 
 ---
 
-## 🚦 Status Workflow
+## Status Workflow
 
 Both Receipts and Deliveries follow this state machine:
 
 ```
-Draft ──► Waiting ──► Ready ──► Done
-  │          │          │
-  └──────────┴──────────┴──► Cancelled
+Draft --> Waiting --> Ready --> Done
+  |           |          |
+  +-----------+----------+--> Cancelled
 ```
 
-Stock updates **only** on transition to `Done` via the Validate action.
+Stock levels update **only** on transition to `Done` via the Validate action.
 
-Stock Adjustments follow:
+Stock Adjustments:
+
 ```
-Pending Approval ──► Approved (stock corrected)
-                 └──► Rejected (stock unchanged)
+Pending Approval --> Approved  (stock delta applied)
+                 --> Rejected  (stock unchanged)
 ```
 
 ---
 
-## 📊 Success Metrics
+## Success Metrics
 
 | Metric | Target |
 |--------|--------|
-| End-to-end receipt workflow | Completable in < 2 minutes |
-| End-to-end delivery workflow | Completable in < 2 minutes |
-| Dashboard data freshness | Live updates within **2 seconds** |
-| Stock accuracy after validation | **100%** match between UI and DB |
+| End-to-end receipt workflow | Completable in under 2 minutes |
+| End-to-end delivery workflow | Completable in under 2 minutes |
+| Dashboard data freshness | Live updates within 2 seconds |
+| Stock accuracy after validation | 100% match between UI and DB |
 | Low stock alert trigger | Fires within 1 operation of threshold breach |
-| Role enforcement | Staff cannot access Manager routes via URL **or** API |
-| Audit trail completeness | **100%** of Create/Validate/Adjust actions in Move History |
+| Role enforcement | Staff cannot access Manager routes via URL or API |
+| Audit trail completeness | 100% of Create/Validate/Adjust actions in Move History |
 
 ---
 
-## 🗓️ MVP Scope
+## MVP Scope
 
-### ✅ In Scope
+### In Scope
 
 - Auth (Signup / Login / OTP Reset)
 - Role-Based Access (Manager / Staff)
@@ -452,19 +464,19 @@ Pending Approval ──► Approved (stock corrected)
 - Product Management (CRUD + SKU search)
 - Receipt Workflow (incoming stock)
 - Delivery Orders (outgoing stock)
-- Stock Adjustments + Approval Flow
-- Low Stock & Out-of-Stock Alerts
-- Multi-Warehouse Support (2–5)
+- Stock Adjustments with Approval Flow
+- Low Stock and Out-of-Stock Alerts
+- Multi-Warehouse Support (2–5 warehouses)
 - Move History / Audit Ledger
 - Odoo ERP Integration (connection + product sync)
 
-### ❌ Post-MVP (Not in this release)
+### Post-MVP — Not in This Release
 
-Internal Transfers · Barcode/QR scanning · Supplier portal · Purchase Orders · Demand forecasting · Mobile app · Email/SMS notifications · Shipping integrations · Custom reports · Bulk CSV import
+Internal Transfers, Barcode/QR scanning, Supplier portal, Purchase Orders, Demand forecasting, Mobile app, Email/SMS notifications, Shipping integrations, Custom reports, Bulk CSV import.
 
 ---
 
-## 📁 Documentation
+## Documentation
 
 All project documents are in the repository root:
 
@@ -477,40 +489,40 @@ All project documents are in the repository root:
 
 ---
 
-## 🌐 Deployment
+## Deployment
 
-### Frontend → Vercel
+### Frontend — Vercel
 
 ```bash
-# Push to main branch → Vercel auto-deploys
-# Set these env vars in Vercel dashboard:
+# Push to main branch — Vercel auto-deploys
+# Set these environment variables in the Vercel dashboard:
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
 VITE_API_BASE_URL=https://your-api.railway.app/api/v1
 ```
 
-### Backend → Railway
+### Backend — Railway
 
 ```bash
-# Connect GitHub repo → Railway detects Node.js automatically
-# Add all server .env vars in Railway dashboard
-# Railway provides HTTPS URL automatically
+# Connect GitHub repo — Railway detects Node.js automatically
+# Add all server environment variables in the Railway dashboard
+# Railway provides an HTTPS URL automatically
 ```
 
 ### Databases
 
-- **Supabase** Free Tier — 500MB PostgreSQL, 50MB file storage
-- **MongoDB Atlas** Free M0 Cluster — 512MB, sufficient for MVP ledger
+- **Supabase** Free Tier — 500 MB PostgreSQL, 50 MB file storage
+- **MongoDB Atlas** Free M0 Cluster — 512 MB, sufficient for MVP ledger
 
 ---
 
-## ⚙️ Environment Variables
+## Environment Variables
 
 ### Server (`server/.env`)
 
 ```env
 SUPABASE_URL=                     # Supabase project URL
-SUPABASE_SERVICE_ROLE_KEY=        # Service role key (never expose to frontend)
+SUPABASE_SERVICE_ROLE_KEY=        # Service role key — never expose to frontend
 MONGODB_URI=                      # MongoDB Atlas connection string
 ODOO_HOST=                        # Optional: Odoo server hostname
 ODOO_PORT=8069
@@ -525,36 +537,39 @@ ALLOWED_ORIGINS=http://localhost:5173
 
 ```env
 VITE_SUPABASE_URL=                # Same Supabase URL
-VITE_SUPABASE_ANON_KEY=           # Anon/public key (safe to expose)
+VITE_SUPABASE_ANON_KEY=           # Anon/public key — safe to expose to browser
 VITE_API_BASE_URL=http://localhost:3001/api/v1
 ```
 
 ---
 
-## 🧪 Testing
+## Testing
 
-Run test scenarios manually as described in [`StockSense_DevPlan.md`](./StockSense_DevPlan.md) § Phase 6.
+Run test scenarios manually as described in [`StockSense_DevPlan.md`](./StockSense_DevPlan.md) — Phase 6.
 
 Key test areas:
-- **T-AUTH**: Signup → OTP → Login → Reset Password
-- **T-RBAC**: Role enforcement via URL and direct API call
-- **T-STOCK**: Receipt/Delivery validation, over-delivery block, race conditions
-- **T-LEDGER**: Audit trail completeness and filter accuracy
-- **T-DASHBOARD**: Real-time KPI update within 2 seconds
+
+| Area | Description |
+|------|-------------|
+| **T-AUTH** | Signup, OTP verification, Login, Password Reset |
+| **T-RBAC** | Role enforcement via URL and direct API call |
+| **T-STOCK** | Receipt/Delivery validation, over-delivery block, concurrent updates |
+| **T-LEDGER** | Audit trail completeness and filter accuracy |
+| **T-DASHBOARD** | Real-time KPI update within 2 seconds of a stock operation |
 
 ---
 
-## 👥 Team
+## Team
 
-| Role | Responsibility |
-|------|---------------|
-| **P1 — Backend Lead** | Auth, RBAC middleware, Receipts/Deliveries API, Stock Service |
-| **P2 — Frontend Lead** | React scaffold, UI components, Auth pages, Dashboard Realtime |
-| **P3 — Fullstack / DB** | DB schema, Products API, Ledger service, Odoo integration |
+| Person | Role | Responsibility |
+|--------|------|---------------|
+| P1 | Backend Lead | Auth, RBAC middleware, Receipts/Deliveries API, Stock Service |
+| P2 | Frontend Lead | React scaffold, UI components, Auth pages, Dashboard Realtime |
+| P3 | Fullstack / DB | DB schema, Products API, Ledger service, Odoo integration |
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License.
 
@@ -562,8 +577,8 @@ This project is licensed under the MIT License.
 
 <div align="center">
 
-**Built with ❤️ for the Odoo Hackathon 2026**
+Built for the Odoo Hackathon 2026
 
-*StockSense — Real-time inventory. Zero guesswork.*
+**StockSense — Real-time inventory. Zero guesswork.**
 
 </div>
